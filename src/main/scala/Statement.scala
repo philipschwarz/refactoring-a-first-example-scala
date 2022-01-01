@@ -3,26 +3,28 @@ import java.util.{Currency, Locale}
 
 case class Play(name: String, `type`: String)
 
-case class Performance(
+case class Performance(playID: String, audience: Int)
+
+case class EnrichedPerformance(
   playID: String,
-  play: Option[Play] = None,
+  play: Play,
   audience: Int,
-  amount: Option[Int] = None,
-  volumeCredits: Option[Int] = None)
+  amount: Int,
+  volumeCredits: Int)
 
 case class Invoice(customer: String, performances: List[Performance])
 
-case class StatementData(customer: String, performances: List[Performance])
+case class StatementData(customer: String, performances: List[EnrichedPerformance])
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
 
-  def enrichPerformance(aPerformance: Performance): Performance =
-    Performance(
+  def enrichPerformance(aPerformance: Performance): EnrichedPerformance =
+    EnrichedPerformance(
       aPerformance.playID,
-      Some(playFor(aPerformance)),
+      playFor(aPerformance),
       aPerformance.audience,
-      Some(amountFor(aPerformance)),
-      Some(volumeCreditsFor(aPerformance)))
+      amountFor(aPerformance),
+      volumeCreditsFor(aPerformance))
 
   def playFor(aPerformance: Performance): Play =
     plays(aPerformance.playID)
@@ -62,18 +64,18 @@ def renderPlainText(data: StatementData): String =
   def totalVolumeCredits: Int =
     var result = 0
     for (perf <- data.performances)
-      result += perf.volumeCredits.get
+      result += perf.volumeCredits
     result
 
   def totalAmount: Int =
     var result = 0
     for (perf <- data.performances)
-      result += perf.amount.get
+      result += perf.amount
     result
 
   var result = s"Statement for ${data.customer}\n"
   for (perf <- data.performances)
-    result += s"  ${perf.play.get.name}: ${usd(perf.amount.get/100)} (${perf.audience} seats)\n"
+    result += s"  ${perf.play.name}: ${usd(perf.amount/100)} (${perf.audience} seats)\n"
 
   result += s"Amount owed is ${usd(totalAmount/100)}\n"
   result += s"You earned $totalVolumeCredits credits\n"
