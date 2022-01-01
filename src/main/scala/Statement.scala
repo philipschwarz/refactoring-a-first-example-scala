@@ -40,22 +40,22 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     formatter.format(aNumber)
 
   def totalVolumeCredits: Int =
-    var volumeCredits = 0
+    var result = 0
     for (perf <- invoice.performances)
-      volumeCredits += volumeCreditsFor(perf)
-    volumeCredits
+      result += volumeCreditsFor(perf)
+    result
 
-  def appleSauce: Int =
-    var totalAmount = 0
+  def totalAmount: Int =
+    var result = 0
     for (perf <- invoice.performances)
-      totalAmount += amountFor(perf)
-    totalAmount
+      result += amountFor(perf)
+    result
 
   var result = s"Statement for ${invoice.customer}\n"
   for (perf <- invoice.performances)
     result += s"  ${playFor(perf).name}: ${usd(amountFor(perf) /100)} (${perf.audience} seats)\n"
 
-  result += s"Amount owed is ${usd(appleSauce/100)}\n"
+  result += s"Amount owed is ${usd(totalAmount/100)}\n"
   result += s"You earned $totalVolumeCredits credits\n"
   result
 
