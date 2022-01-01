@@ -7,13 +7,13 @@ case class Performance(playID: String, audience: Int)
 
 case class Invoice(customer: String, performances: List[Performance])
 
-case class StatementData(customer: String)
+case class StatementData(customer: String, performances: List[Performance])
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
-  val statementData = StatementData(invoice.customer)
-  renderPlainText(statementData,invoice,plays)
+  val statementData = StatementData(invoice.customer,invoice.performances)
+  renderPlainText(statementData,plays)
 
-def renderPlainText(data: StatementData, invoice: Invoice, plays: Map[String, Play]): String =
+def renderPlainText(data: StatementData, plays: Map[String, Play]): String =
 
   def amountFor(aPerformance: Performance): Int =
     var result = 0
@@ -47,18 +47,18 @@ def renderPlainText(data: StatementData, invoice: Invoice, plays: Map[String, Pl
 
   def totalVolumeCredits: Int =
     var result = 0
-    for (perf <- invoice.performances)
+    for (perf <- data.performances)
       result += volumeCreditsFor(perf)
     result
 
   def totalAmount: Int =
     var result = 0
-    for (perf <- invoice.performances)
+    for (perf <- data.performances)
       result += amountFor(perf)
     result
 
   var result = s"Statement for ${data.customer}\n"
-  for (perf <- invoice.performances)
+  for (perf <- data.performances)
     result += s"  ${playFor(perf).name}: ${usd(amountFor(perf) /100)} (${perf.audience} seats)\n"
 
   result += s"Amount owed is ${usd(totalAmount/100)}\n"
