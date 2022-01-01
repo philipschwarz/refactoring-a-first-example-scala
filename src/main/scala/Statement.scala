@@ -3,7 +3,11 @@ import java.util.{Currency, Locale}
 
 case class Play(name: String, `type`: String)
 
-case class Performance(playID: String, play: Option[Play] = None, audience: Int)
+case class Performance(
+  playID: String,
+  play: Option[Play] = None,
+  audience: Int,
+  amount: Option[Int] = None)
 
 case class Invoice(customer: String, performances: List[Performance])
 
@@ -12,19 +16,18 @@ case class StatementData(customer: String, performances: List[Performance])
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
 
   def enrichPerformance(aPerformance: Performance): Performance =
-    Performance(aPerformance.playID,Some(playFor(aPerformance)),aPerformance.audience)
+    Performance(
+      aPerformance.playID,
+      Some(playFor(aPerformance)),
+      aPerformance.audience,
+      Some(amountFor(aPerformance)))
 
   def playFor(aPerformance: Performance): Play =
     plays(aPerformance.playID)
 
-  val statementData = StatementData(invoice.customer,invoice.performances.map(enrichPerformance))
-  renderPlainText(statementData,plays)
-
-def renderPlainText(data: StatementData, plays: Map[String, Play]): String =
-
   def amountFor(aPerformance: Performance): Int =
     var result = 0
-    aPerformance.play.get.`type` match
+    playFor(aPerformance).`type` match
       case "tragedy" =>
         result = 40_000
         if aPerformance.audience > 30
@@ -35,8 +38,13 @@ def renderPlainText(data: StatementData, plays: Map[String, Play]): String =
         then result += 10_000 + 500 * (aPerformance.audience - 20)
         result += 300 * aPerformance.audience
       case other =>
-        throw IllegalArgumentException(s"unknown type ${aPerformance.play.get.`type`}")
+        throw IllegalArgumentException(s"unknown type ${playFor(aPerformance).`type`}")
     result
+
+  val statementData = StatementData(invoice.customer,invoice.performances.map(enrichPerformance))
+  renderPlainText(statementData)
+
+def renderPlainText(data: StatementData): String =
 
   def volumeCreditsFor(aPerformance: Performance): Int =
     var result = 0
@@ -58,12 +66,12 @@ def renderPlainText(data: StatementData, plays: Map[String, Play]): String =
   def totalAmount: Int =
     var result = 0
     for (perf <- data.performances)
-      result += amountFor(perf)
+      result += perf.amount.get
     result
 
   var result = s"Statement for ${data.customer}\n"
   for (perf <- data.performances)
-    result += s"  ${perf.play.get.name}: ${usd(amountFor(perf) /100)} (${perf.audience} seats)\n"
+    result += s"  ${perf.play.get.name}: ${usd(perf.amount.get/100)} (${perf.audience} seats)\n"
 
   result += s"Amount owed is ${usd(totalAmount/100)}\n"
   result += s"You earned $totalVolumeCredits credits\n"
