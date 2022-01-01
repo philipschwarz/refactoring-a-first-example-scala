@@ -9,7 +9,7 @@ case class Invoice(customer: String, performances: List[Performance])
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
 
-  def amountFor(aPerformance: Performance, play: Play): Int =
+  def amountFor(aPerformance: Performance): Int =
     var result = 0
     playFor(aPerformance).`type` match
       case "tragedy" =>
@@ -35,7 +35,7 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
   formatter.setCurrency(Currency.getInstance(Locale.US))
   
   for (perf <- invoice.performances)
-    var thisAmount = amountFor(perf, playFor(perf))
+    var thisAmount = amountFor(perf)
 
     // add volume credits
     volumeCredits += math.max(perf.audience - 30, 0)
