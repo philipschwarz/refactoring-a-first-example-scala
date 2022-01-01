@@ -34,21 +34,24 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     if "comedy" == playFor(aPerformance).`type` then result += math.floor(aPerformance.audience / 5).toInt
     result
 
+  def usd(aNumber: Int): String =
+    val formatter = NumberFormat.getCurrencyInstance(Locale.US)
+    formatter.setCurrency(Currency.getInstance(Locale.US))
+    formatter.format(aNumber)
+
   var totalAmount = 0
   var volumeCredits = 0
   var result = s"Statement for ${invoice.customer}\n"
-  val formatter = NumberFormat.getCurrencyInstance(Locale.US)
-  formatter.setCurrency(Currency.getInstance(Locale.US))
   
   for (perf <- invoice.performances)
     volumeCredits += volumeCreditsFor(perf)
 
     // print line for this order
-    result += s"  ${playFor(perf).name}: ${formatter.format(amountFor(perf) /100)} (${perf.audience} seats)\n"
+    result += s"  ${playFor(perf).name}: ${usd(amountFor(perf) /100)} (${perf.audience} seats)\n"
     totalAmount += amountFor(perf)
   end for
 
-  result += s"Amount owed is ${formatter.format(totalAmount/100)}\n"
+  result += s"Amount owed is ${usd(totalAmount/100)}\n"
   result += s"You earned $volumeCredits credits\n"
   result
 
