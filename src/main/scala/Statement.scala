@@ -28,6 +28,12 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
   def playFor(aPerformance: Performance): Play =
     plays(aPerformance.playID)
 
+  def volumeCreditsFor(aPerformance: Performance): Int =
+    var result = 0
+    result += math.max(aPerformance.audience - 30, 0)
+    if "comedy" == playFor(aPerformance).`type` then result += math.floor(aPerformance.audience / 5).toInt
+    result
+
   var totalAmount = 0
   var volumeCredits = 0
   var result = s"Statement for ${invoice.customer}\n"
@@ -35,10 +41,7 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
   formatter.setCurrency(Currency.getInstance(Locale.US))
   
   for (perf <- invoice.performances)
-    // add volume credits
-    volumeCredits += math.max(perf.audience - 30, 0)
-    // add extra credit for every ten comedy attendees
-    if "comedy" == playFor(perf).`type` then volumeCredits += math.floor(perf.audience / 5).toInt
+    volumeCredits += volumeCreditsFor(perf)
 
     // print line for this order
     result += s"  ${playFor(perf).name}: ${formatter.format(amountFor(perf) /100)} (${perf.audience} seats)\n"
