@@ -8,6 +8,9 @@ case class Performance(playID: String, audience: Int)
 case class Invoice(customer: String, performances: List[Performance])
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
+  renderPlainText(invoice,plays)
+
+def renderPlainText(invoice: Invoice, plays: Map[String, Play]): String =
 
   def amountFor(aPerformance: Performance): Int =
     var result = 0
