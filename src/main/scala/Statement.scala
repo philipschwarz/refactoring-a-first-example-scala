@@ -14,7 +14,11 @@ case class EnrichedPerformance(
 
 case class Invoice(customer: String, performances: List[Performance])
 
-case class StatementData(customer: String, performances: List[EnrichedPerformance])
+case class StatementData(
+  customer: String,
+  performances: List[EnrichedPerformance],
+  totalAmount: Int,
+  totalVolumeCredits: Int)
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
 
@@ -51,7 +55,23 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     if "comedy" == playFor(aPerformance).`type` then result += math.floor(aPerformance.audience / 5).toInt
     result
 
-  val statementData = StatementData(invoice.customer,invoice.performances.map(enrichPerformance))
+  def totalVolumeCredits(performances: List[EnrichedPerformance]): Int =
+    var result = 0
+    for (perf <- performances)
+      result += perf.volumeCredits
+    result
+
+  def totalAmount(performances: List[EnrichedPerformance]): Int =
+    var result = 0
+    for (perf <- performances)
+      result += perf.amount
+    result
+
+  val enrichedPerformances = invoice.performances.map(enrichPerformance)
+  val statementData = StatementData(invoice.customer,
+                                    enrichedPerformances,
+                                    totalAmount(enrichedPerformances),
+                                    totalVolumeCredits(enrichedPerformances))
   renderPlainText(statementData)
 
 def renderPlainText(data: StatementData): String =
@@ -61,24 +81,12 @@ def renderPlainText(data: StatementData): String =
     formatter.setCurrency(Currency.getInstance(Locale.US))
     formatter.format(aNumber)
 
-  def totalVolumeCredits: Int =
-    var result = 0
-    for (perf <- data.performances)
-      result += perf.volumeCredits
-    result
-
-  def totalAmount: Int =
-    var result = 0
-    for (perf <- data.performances)
-      result += perf.amount
-    result
-
   var result = s"Statement for ${data.customer}\n"
   for (perf <- data.performances)
     result += s"  ${perf.play.name}: ${usd(perf.amount/100)} (${perf.audience} seats)\n"
 
-  result += s"Amount owed is ${usd(totalAmount/100)}\n"
-  result += s"You earned $totalVolumeCredits credits\n"
+  result += s"Amount owed is ${usd(data.totalAmount/100)}\n"
+  result += s"You earned ${data.totalVolumeCredits} credits\n"
   result
 
 val invoices: List[Invoice] = List(
