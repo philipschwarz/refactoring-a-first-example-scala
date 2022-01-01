@@ -35,16 +35,15 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
   formatter.setCurrency(Currency.getInstance(Locale.US))
   
   for (perf <- invoice.performances)
-    val play = playFor(perf)
-    var thisAmount = amountFor(perf,play)
+    var thisAmount = amountFor(perf, playFor(perf))
 
     // add volume credits
     volumeCredits += math.max(perf.audience - 30, 0)
     // add extra credit for every ten comedy attendees
-    if "comedy" == play.`type` then volumeCredits += math.floor(perf.audience / 5).toInt
+    if "comedy" == playFor(perf).`type` then volumeCredits += math.floor(perf.audience / 5).toInt
 
     // print line for this order
-    result += s"  ${play.name}: ${formatter.format(thisAmount/100)} (${perf.audience} seats)\n"
+    result += s"  ${playFor(perf).name}: ${formatter.format(thisAmount/100)} (${perf.audience} seats)\n"
     totalAmount += thisAmount
   end for
 
