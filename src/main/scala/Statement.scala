@@ -8,6 +8,23 @@ case class Performance(playID: String, audience: Int)
 case class Invoice(customer: String, performances: List[Performance])
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
+
+  def amountFor(aPerformance: Performance, play: Play): Int =
+    var result = 0
+    play.`type` match
+      case "tragedy" =>
+        result = 40_000
+        if aPerformance.audience > 30
+        then result += 1_000 * (aPerformance.audience - 30)
+      case "comedy" =>
+        result = 30_000
+        if aPerformance.audience > 20
+        then result += 10_000 + 500 * (aPerformance.audience - 20)
+        result += 300 * aPerformance.audience
+      case other =>
+        throw IllegalArgumentException(s"unknown type ${play.`type`}")
+    result
+
   var totalAmount = 0
   var volumeCredits = 0
   var result = s"Statement for ${invoice.customer}\n"
@@ -16,26 +33,7 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
   
   for (perf <- invoice.performances)
     val play = plays(perf.playID)
-    var thisAmount = 0
-
-    play.`type` match
-
-      case "tragedy" =>
-
-        thisAmount = 40_000
-        if perf.audience > 30 
-        then thisAmount += 1_000 * (perf.audience - 30)
-
-      case "comedy" =>
-
-        thisAmount = 30_000
-        if perf.audience > 20 
-        then thisAmount += 10_000 + 500 * (perf.audience - 20)
-        thisAmount += 300 * perf.audience
-
-      case other =>
-
-        throw IllegalArgumentException(s"unknown type ${play.`type`}")
+    var thisAmount = amountFor(perf,play)
 
     // add volume credits
     volumeCredits += math.max(perf.audience - 30, 0)
@@ -79,5 +77,3 @@ val plays = Map (
        |You earned 47 credits
        |""".stripMargin
   )
-
-
