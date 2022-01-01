@@ -21,6 +21,9 @@ case class StatementData(
   totalVolumeCredits: Int)
 
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
+  renderPlainText(createStatementData(invoice,plays))
+
+def createStatementData(invoice: Invoice, plays: Map[String,Play]): StatementData =
 
   def enrichPerformance(aPerformance: Performance): EnrichedPerformance =
     EnrichedPerformance(
@@ -62,11 +65,10 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     performances.foldLeft(0)((total,perf) => total + perf.amount)
 
   val enrichedPerformances = invoice.performances.map(enrichPerformance)
-  val statementData = StatementData(invoice.customer,
-                                    enrichedPerformances,
-                                    totalAmount(enrichedPerformances),
-                                    totalVolumeCredits(enrichedPerformances))
-  renderPlainText(statementData)
+  StatementData(invoice.customer,
+    enrichedPerformances,
+    totalAmount(enrichedPerformances),
+    totalVolumeCredits(enrichedPerformances))
 
 def renderPlainText(data: StatementData): String =
 
