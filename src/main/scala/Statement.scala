@@ -56,16 +56,10 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     result
 
   def totalVolumeCredits(performances: List[EnrichedPerformance]): Int =
-    var result = 0
-    for (perf <- performances)
-      result += perf.volumeCredits
-    result
+    performances.foldLeft(0)((total,perf) => total + perf.volumeCredits)
 
   def totalAmount(performances: List[EnrichedPerformance]): Int =
-    var result = 0
-    for (perf <- performances)
-      result += perf.amount
-    result
+    performances.foldLeft(0)((total,perf) => total + perf.amount)
 
   val enrichedPerformances = invoice.performances.map(enrichPerformance)
   val statementData = StatementData(invoice.customer,
