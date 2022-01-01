@@ -7,7 +7,8 @@ case class Performance(
   playID: String,
   play: Option[Play] = None,
   audience: Int,
-  amount: Option[Int] = None)
+  amount: Option[Int] = None,
+  volumeCredits: Option[Int] = None)
 
 case class Invoice(customer: String, performances: List[Performance])
 
@@ -20,7 +21,8 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
       aPerformance.playID,
       Some(playFor(aPerformance)),
       aPerformance.audience,
-      Some(amountFor(aPerformance)))
+      Some(amountFor(aPerformance)),
+      Some(volumeCreditsFor(aPerformance)))
 
   def playFor(aPerformance: Performance): Play =
     plays(aPerformance.playID)
@@ -41,16 +43,16 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
         throw IllegalArgumentException(s"unknown type ${playFor(aPerformance).`type`}")
     result
 
+  def volumeCreditsFor(aPerformance: Performance): Int =
+    var result = 0
+    result += math.max(aPerformance.audience - 30, 0)
+    if "comedy" == playFor(aPerformance).`type` then result += math.floor(aPerformance.audience / 5).toInt
+    result
+
   val statementData = StatementData(invoice.customer,invoice.performances.map(enrichPerformance))
   renderPlainText(statementData)
 
 def renderPlainText(data: StatementData): String =
-
-  def volumeCreditsFor(aPerformance: Performance): Int =
-    var result = 0
-    result += math.max(aPerformance.audience - 30, 0)
-    if "comedy" == aPerformance.play.get.`type` then result += math.floor(aPerformance.audience / 5).toInt
-    result
 
   def usd(aNumber: Int): String =
     val formatter = NumberFormat.getCurrencyInstance(Locale.US)
@@ -60,7 +62,7 @@ def renderPlainText(data: StatementData): String =
   def totalVolumeCredits: Int =
     var result = 0
     for (perf <- data.performances)
-      result += volumeCreditsFor(perf)
+      result += perf.volumeCredits.get
     result
 
   def totalAmount: Int =
