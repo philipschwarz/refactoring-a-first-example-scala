@@ -25,6 +25,9 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
         throw IllegalArgumentException(s"unknown type ${play.`type`}")
     result
 
+  def playFor(aPerformance: Performance): Play =
+    plays(aPerformance.playID)
+
   var totalAmount = 0
   var volumeCredits = 0
   var result = s"Statement for ${invoice.customer}\n"
@@ -32,7 +35,7 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
   formatter.setCurrency(Currency.getInstance(Locale.US))
   
   for (perf <- invoice.performances)
-    val play = plays(perf.playID)
+    val play = playFor(perf)
     var thisAmount = amountFor(perf,play)
 
     // add volume credits
