@@ -11,7 +11,7 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
 
   def amountFor(aPerformance: Performance, play: Play): Int =
     var result = 0
-    play.`type` match
+    playFor(aPerformance).`type` match
       case "tragedy" =>
         result = 40_000
         if aPerformance.audience > 30
@@ -22,7 +22,7 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
         then result += 10_000 + 500 * (aPerformance.audience - 20)
         result += 300 * aPerformance.audience
       case other =>
-        throw IllegalArgumentException(s"unknown type ${play.`type`}")
+        throw IllegalArgumentException(s"unknown type ${playFor(aPerformance).`type`}")
     result
 
   def playFor(aPerformance: Performance): Play =
