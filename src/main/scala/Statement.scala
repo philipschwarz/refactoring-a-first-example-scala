@@ -39,6 +39,12 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     formatter.setCurrency(Currency.getInstance(Locale.US))
     formatter.format(aNumber)
 
+  def totalVolumeCredits: Int =
+    var volumeCredits = 0
+    for (perf <- invoice.performances)
+      volumeCredits += volumeCreditsFor(perf)
+    volumeCredits
+
   var totalAmount = 0
   var result = s"Statement for ${invoice.customer}\n"
   
@@ -48,12 +54,8 @@ def statement(invoice: Invoice, plays: Map[String, Play]): String =
     result += s"  ${playFor(perf).name}: ${usd(amountFor(perf) /100)} (${perf.audience} seats)\n"
     totalAmount += amountFor(perf)
 
-  var volumeCredits = 0
-  for (perf <- invoice.performances)
-    volumeCredits += volumeCreditsFor(perf)
-
   result += s"Amount owed is ${usd(totalAmount/100)}\n"
-  result += s"You earned $volumeCredits credits\n"
+  result += s"You earned $totalVolumeCredits credits\n"
   result
 
 val invoices: List[Invoice] = List(
