@@ -23,10 +23,7 @@ sealed trait PerformanceCalculator:
   def amount: Int =
     var result = 0
     play.`type` match
-      case "tragedy" =>
-        result = 40_000
-        if performance.audience > 30
-        then result += 1_000 * (performance.audience - 30)
+      case "tragedy" => throw IllegalArgumentException("bad thing")
       case "comedy" =>
         result = 30_000
         if performance.audience > 20
@@ -40,7 +37,12 @@ sealed trait PerformanceCalculator:
     result += math.max(performance.audience - 30, 0)
     if "comedy" == play.`type` then result += math.floor(performance.audience / 5).toInt
     result
-case class TragedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator
+case class TragedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator:
+  override def amount: Int =
+    var result = 0
+    result = 40_000
+    if performance.audience > 30 then result += 1_000 * (performance.audience - 30)
+    result
 case class ComedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator
 object PerformanceCalculator:
   def apply(aPerformance: Performance, aPlay: Play): PerformanceCalculator =
