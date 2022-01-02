@@ -13,21 +13,8 @@ def createStatementData(invoice: Invoice, plays: Map[String,Play]): StatementDat
     plays(aPerformance.playID)
 
   def amountFor(aPerformance: Performance): Int =
-    var result = 0
-    playFor(aPerformance).`type` match
-      case "tragedy" =>
-        result = 40_000
-        if aPerformance.audience > 30
-        then result += 1_000 * (aPerformance.audience - 30)
-      case "comedy" =>
-        result = 30_000
-        if aPerformance.audience > 20
-        then result += 10_000 + 500 * (aPerformance.audience - 20)
-        result += 300 * aPerformance.audience
-      case other =>
-        throw IllegalArgumentException(s"unknown type ${playFor(aPerformance).`type`}")
-    result
-
+    PerformanceCalculator(aPerformance,playFor(aPerformance)).amount
+    
   def volumeCreditsFor(aPerformance: Performance): Int =
     var result = 0
     result += math.max(aPerformance.audience - 30, 0)
