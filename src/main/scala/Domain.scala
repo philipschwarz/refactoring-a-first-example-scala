@@ -3,18 +3,18 @@ case class Play(name: String, `type`: String)
 case class Performance(playID: String, audience: Int)
 
 case class EnrichedPerformance(
-                                playID: String,
-                                play: Play,
-                                audience: Int,
-                                amount: Int,
-                                volumeCredits: Int)
+  playID: String,
+  play: Play,
+  audience: Int,
+  amount: Int,
+  volumeCredits: Int)
 
 case class Invoice(customer: String, performances: List[Performance])
 
 case class StatementData(
-                          customer: String,
-                          performances: List[EnrichedPerformance],
-                          totalAmount: Int,
-                          totalVolumeCredits: Int)
+  customer: String,
+  performances: List[EnrichedPerformance],
+  totalAmount: Int,
+  totalVolumeCredits: Int)
 
-case class PerformanceCalculator(performance: Performance)
+case class PerformanceCalculator(performance: Performance, play: Play)
