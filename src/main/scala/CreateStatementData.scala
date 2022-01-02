@@ -7,13 +7,10 @@ def createStatementData(invoice: Invoice, plays: Map[String,Play]): StatementDat
       calculator.play,
       aPerformance.audience,
       calculator.amount,
-      volumeCreditsFor(aPerformance))
+      calculator.volumeCredits)
 
   def playFor(aPerformance: Performance): Play =
     plays(aPerformance.playID)
-
-  def volumeCreditsFor(aPerformance: Performance): Int =
-    PerformanceCalculator(aPerformance,playFor(aPerformance)).volumeCredits
 
   def totalVolumeCredits(performances: List[EnrichedPerformance]): Int =
     performances.foldLeft(0)((total,perf) => total + perf.volumeCredits)
