@@ -13,10 +13,10 @@ def createStatementData(invoice: Invoice, plays: Map[String,Play]): StatementDat
     plays(aPerformance.playID)
 
   def totalVolumeCredits(performances: List[EnrichedPerformance]): Int =
-    performances.foldLeft(0)((total,perf) => total + perf.volumeCredits)
+    performances.map(_.volumeCredits).sum
 
   def totalAmount(performances: List[EnrichedPerformance]): Int =
-    performances.foldLeft(0)((total,perf) => total + perf.amount)
+    performances.map(_.amount).sum
 
   val enrichedPerformances = invoice.performances.map(enrichPerformance)
   StatementData(invoice.customer,
