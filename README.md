@@ -1,0 +1,2 @@
+Scala code for [Refactoring: A First Example - Martin Fowler’s First Example of Refactoring, Adapted to Scala](https://www.slideshare.net/pjschwarz/refactoring-a-first-example-martin-fowlers-first-example-of-refactoring-adapted-to-scala)
+![Refactoring: A First Example - Martin Fowler’s First Example of Refactoring, Adapted to Scala](images/refactoring-a-first-example-the-refactoring-example-by-martin-fowler-adapted-to-scala.png?raw=true )
