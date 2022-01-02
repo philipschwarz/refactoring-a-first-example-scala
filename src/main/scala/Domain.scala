@@ -21,11 +21,7 @@ sealed trait PerformanceCalculator:
   def performance: Performance
   def play: Play
   def amount: Int
-  def volumeCredits: Int =
-    var result = 0
-    result += math.max(performance.audience - 30, 0)
-    if "comedy" == play.`type` then result += math.floor(performance.audience / 5).toInt
-    result
+  def volumeCredits: Int = math.max(performance.audience - 30, 0)
 case class TragedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator:
   def amount: Int =
     var result = 0
@@ -38,6 +34,8 @@ case class ComedyCalculator(performance: Performance, play: Play) extends Perfor
     if performance.audience > 20 then result += 10_000 + 500 * (performance.audience - 20)
     result += 300 * performance.audience
     result
+  override def volumeCredits: Int =
+    super.volumeCredits + math.floor(performance.audience / 5).toInt
 object PerformanceCalculator:
   def apply(aPerformance: Performance, aPlay: Play): PerformanceCalculator =
     aPlay.`type` match
