@@ -17,7 +17,9 @@ case class StatementData(
   totalAmount: Int,
   totalVolumeCredits: Int)
 
-case class PerformanceCalculator(performance: Performance, play: Play):
+sealed trait PerformanceCalculator:
+  def performance: Performance
+  def play: Play
   def amount: Int =
     var result = 0
     play.`type` match
@@ -38,4 +40,11 @@ case class PerformanceCalculator(performance: Performance, play: Play):
     result += math.max(performance.audience - 30, 0)
     if "comedy" == play.`type` then result += math.floor(performance.audience / 5).toInt
     result
-  
+case class TragedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator
+case class ComedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator
+object PerformanceCalculator:
+  def apply(aPerformance: Performance, aPlay: Play): PerformanceCalculator =
+    aPlay.`type` match
+      case "tragedy" => TragedyCalculator(aPerformance, aPlay)
+      case "comedy" => ComedyCalculator(aPerformance, aPlay)
+      case other => throw IllegalArgumentException(s"unknown type ${aPlay.`type`}")
