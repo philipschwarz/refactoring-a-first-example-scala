@@ -16,3 +16,5 @@ case class StatementData(
                           performances: List[EnrichedPerformance],
                           totalAmount: Int,
                           totalVolumeCredits: Int)
+
+case class PerformanceCalculator(performance: Performance)

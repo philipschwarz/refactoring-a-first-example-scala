@@ -1,6 +1,7 @@
 def createStatementData(invoice: Invoice, plays: Map[String,Play]): StatementData =
 
   def enrichPerformance(aPerformance: Performance): EnrichedPerformance =
+    val calculator = PerformanceCalculator(aPerformance)
     EnrichedPerformance(
       aPerformance.playID,
       playFor(aPerformance),
