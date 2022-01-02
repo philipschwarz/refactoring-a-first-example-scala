@@ -33,4 +33,9 @@ case class PerformanceCalculator(performance: Performance, play: Play):
       case other =>
         throw IllegalArgumentException(s"unknown type ${play.`type`}")
     result
+  def volumeCredits: Int =
+    var result = 0
+    result += math.max(performance.audience - 30, 0)
+    if "comedy" == play.`type` then result += math.floor(performance.audience / 5).toInt
+    result
   
