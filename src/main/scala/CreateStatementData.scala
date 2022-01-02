@@ -6,15 +6,12 @@ def createStatementData(invoice: Invoice, plays: Map[String,Play]): StatementDat
       aPerformance.playID,
       calculator.play,
       aPerformance.audience,
-      amountFor(aPerformance),
+      calculator.amount,
       volumeCreditsFor(aPerformance))
 
   def playFor(aPerformance: Performance): Play =
     plays(aPerformance.playID)
 
-  def amountFor(aPerformance: Performance): Int =
-    PerformanceCalculator(aPerformance,playFor(aPerformance)).amount
-    
   def volumeCreditsFor(aPerformance: Performance): Int =
     var result = 0
     result += math.max(aPerformance.audience - 30, 0)
