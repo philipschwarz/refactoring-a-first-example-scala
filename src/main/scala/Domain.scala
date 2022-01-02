@@ -24,16 +24,15 @@ sealed trait PerformanceCalculator:
   def volumeCredits: Int = math.max(performance.audience - 30, 0)
 case class TragedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator:
   def amount: Int =
-    var result = 0
-    result = 40_000
-    if performance.audience > 30 then result += 1_000 * (performance.audience - 30)
-    result
+    val basicAmount = 40_000
+    val largeAudiencePremiumAmount = if performance.audience <= 30 then 0 else 1_000 * (performance.audience - 30)
+    basicAmount + largeAudiencePremiumAmount
 case class ComedyCalculator(performance: Performance, play: Play) extends PerformanceCalculator:
   def amount: Int =
-    var result = 30_000
-    if performance.audience > 20 then result += 10_000 + 500 * (performance.audience - 20)
-    result += 300 * performance.audience
-    result
+    val basicAmount = 30_000
+    val largeAudiencePremiumAmount = if performance.audience <= 20 then 0 else 10_000 + 500 * (performance.audience - 20)
+    val audienceSizeAmount = 300 * performance.audience
+    basicAmount + largeAudiencePremiumAmount + audienceSizeAmount  
   override def volumeCredits: Int =
     super.volumeCredits + math.floor(performance.audience / 5).toInt
 object PerformanceCalculator:
