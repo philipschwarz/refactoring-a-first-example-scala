@@ -4,6 +4,9 @@ import java.util.{Currency, Locale}
 def statement(invoice: Invoice, plays: Map[String, Play]): String =
   renderPlainText(createStatementData(invoice,plays))
 
+def htmlStatement(invoice: Invoice, plays: Map[String, Play]): String =
+  renderHtml(createStatementData(invoice,plays))
+
 def renderPlainText(data: StatementData): String =
   s"Statement for ${data.customer}\n" + (
     for
@@ -13,9 +16,6 @@ def renderPlainText(data: StatementData): String =
   s"""|Amount owed is ${usd(data.totalAmount/100)}
       |You earned ${data.totalVolumeCredits} credits
       |""".stripMargin
-
-def htmlStatement(invoice: Invoice, plays: Map[String, Play]): String =
-  renderHtml(createStatementData(invoice,plays))
 
 def renderHtml(data: StatementData): String =
   s"""|<h1>Statement for ${data.customer}</h1>
